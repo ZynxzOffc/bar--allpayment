@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>PAYMENT BAR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --glow-color: #3b82f6; /* Tailwind blue-500 */
+    }
+
+    /* ### BACKGROUND ORIGINAL ### */
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('https://files.catbox.moe/12kfbj.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.2); /* Overlay gelap original */
+      z-index: 0;
+    }
+    
+    /* --- Keyframe Animations --- */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    @keyframes button-press {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    
+    .pressed {
+      animation: button-press 0.3s ease-out;
+    }
+    
+    /* --- Main Container Styling --- */
+    .container {
+      position: relative;
+      z-index: 1;
+      background-color: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 50px rgba(0,0,0,0.5), 0 0 30px rgba(var(--glow-color), 0.2);
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .container h2 {
+      color: #e5e7eb;
+      text-shadow: 0 0 4px white, 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
+    }
+
+    /* --- Payment Item Styling --- */
+    .payment-item {
+      background-color: rgba(31, 41, 55, 0.6);
+      border-left: 4px solid var(--glow-color);
+      transition: all 0.3s ease;
+    }
+    
+    .payment-item:hover {
+      transform: translateX(5px);
+      background-color: rgba(55, 65, 81, 0.8);
+      border-left-color: #60a5fa;
+      box-shadow: 0 0 15px rgba(var(--glow-color), 0.5);
+    }
+    
+    .payment-item .icon-bg {
+        filter: drop-shadow(0 0 3px rgba(var(--glow-color), 0.6));
+    }
+    
+    .action-button {
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .action-button:hover {
+      color: white;
+      transform: scale(1.1);
+    }
+
+    /* --- Modal Styling --- */
+    .modal {
+      position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center;
+    }
+    .modal-content {
+      position: relative; background-color: #fefefe; padding: 10px; border-radius: 8px;
+      width: 90%; max-width: 380px; box-shadow: 0 0 25px rgba(255,255,255,0.2), 0 0 50px rgba(255,255,255,0.1);
+    }
+    .modal-content img { width: 100%; display: block; border-radius: 4px; }
+    .close-button {
+      position: absolute; top: -15px; right: -15px; color: #000; background-color: #fff;
+      font-size: 24px; font-weight: bold; width: 35px; height: 35px; border-radius: 50%;
+      display: flex; justify-content: center; align-items: center; cursor: pointer;
+      border: 2px solid #333; transition: all 0.2s ease;
+    }
+    .close-button:hover, .close-button:focus {
+      color: white; background-color: #ef4444; transform: rotate(90deg) scale(1.1); border-color: #ef4444;
+    }
+
+    /* ### CSS TOAST NOTIFICATION (ANIMASI TIDAK BERUBAH) ### */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(100px); /* Mulai dari bawah layar */
+      background-color: rgba(31, 41, 55, 0.9); /* bg-gray-800 */
+      color: #e5e7eb; /* gray-200 */
+      padding: 12px 24px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); z-index: 200;
+      opacity: 0; visibility: hidden;
+      transition: transform 0.5s ease, opacity 0.5s ease, visibility 0.5s;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <!-- ### CONTAINER PEMBAYARAN UTAMA ### -->
+  <div class="container w-[320px] max-w-[90vw] rounded-xl p-5 text-gray-300">
+    <h2 class="text-center mb-5 text-white text-lg font-semibold tracking-widest">PAYMENT BAR</h2>
+    <div class="space-y-3">
+      <!-- Payment item 1: Dana -->
+      <div class="payment-item flex items-center rounded-lg p-2 space-x-4">
+        <div class="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-white border-2 border-blue-500 icon-bg">
+          <img alt="Dana logo" class="h-5 w-5" src="https://files.catbox.moe/n3pl02.jpg" />
+        </div>
+        <div class="flex-1 font-mono text-sm text-gray-300" id="num1">0877********</div>
+        <button class="action-button text-gray-400 pr-2" onclick="copyToClipboard(event, '087711083795')">
+          <i class="far fa-copy"></i>
+        </button>
+      </div>
+      <!-- Payment item 2: OVO -->
+      <div class="payment-item flex items-center rounded-lg p-2 space-x-4">
+        <div class="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full border-2 border-blue-500 icon-bg">
+          <img alt="OVO logo" class="h-full w-full rounded-full" src="https://files.catbox.moe/tcwv4j.png" />
+        </div>
+        <div class="flex-1 font-mono text-sm text-gray-300" id="num2">0877********</div>
+        <button class="action-button text-gray-400 pr-2" onclick="copyToClipboard(event, '087711083795')">
+          <i class="far fa-copy"></i>
+        </button>
+      </div>
+      <!-- Payment item 3: GoPay -->
+      <div class="payment-item flex items-center rounded-lg p-2 space-x-4">
+        <div class="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-white border-2 border-blue-500 icon-bg">
+          <img alt="GoPay logo" class="h-6 w-6" src="https://files.catbox.moe/kb9c9s.png" />
+        </div>
+        <div class="flex-1 font-mono text-sm text-gray-300" id="num3">0877********</div>
+        <button class="action-button text-gray-400 pr-2" onclick="copyToClipboard(event, '087711083795')">
+          <i class="far fa-copy"></i>
+        </button>
+      </div>
+      <!-- Menu QRIS -->
+      <div class="payment-item flex items-center rounded-lg p-2 space-x-4">
+        <div class="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-white border-2 border-blue-500 icon-bg">
+          <img alt="QRIS logo" class="h-6 w-6" src="https://files.catbox.moe/rm2qo0.png" />
+        </div>
+        <div class="flex-1 font-mono text-sm text-gray-300">QRIS</div>
+        <button class="action-button text-gray-400 pr-2" onclick="showQrModal(event)">
+          <i class="fas fa-qrcode"></i>
+        </button>
+      </div>
+    </div>
+    <p class="text-center text-gray-400 text-xs mt-4 mb-4 font-mono px-2">
+      Silakan transfer ke nomor di atas.
+    </p>
+    <a href="https://wa.me/6287711083795" target="_blank" rel="noopener noreferrer" class="block w-full text-center no-underline bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/50">
+      Chat BAR
+    </a>
+  </div>
+
+  <!-- --- MODAL HTML UNTUK QRIS --- -->
+  <div id="qrisModal" class="modal hidden" onclick="hideQrModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <span class="close-button" onclick="hideQrModal()">×</span>
+      <img src="https://files.catbox.moe/ksb5j2.jpg" alt="QRIS Code Akbarzz SRC">
+    </div>
+  </div>
+
+  <!-- ### HTML TOAST DIPERBARUI ### -->
+  <div id="toast-notification" class="toast">
+    <div class="flex items-center gap-x-3"> <!-- Menggunakan Flexbox untuk merapikan -->
+      <i id="toast-icon" class="text-xl"></i> <!-- Ikon akan diisi via JS -->
+      <p id="toast-message" class="font-semibold"></p> <!-- Teks pesan -->
+    </div>
+  </div>
+
+
+  <script>
+    const qrisModal = document.getElementById('qrisModal');
+    const toast = document.getElementById('toast-notification');
+    const toastMessage = document.getElementById('toast-message');
+    // ### BARU: Mengambil elemen ikon toast ###
+    const toastIcon = document.getElementById('toast-icon');
+    let toastTimeout;
+
+    // ### FUNGSI TOAST DIPERBARUI ###
+    function showToast(message, type = 'success') {
+      clearTimeout(toastTimeout);
+      
+      toastIcon.classList.remove('fas', 'fa-check-circle', 'fa-times-circle', 'text-green-500', 'text-red-500');
+
+      if (type === 'success') {
+        toastIcon.classList.add('fas', 'fa-check-circle', 'text-green-500');
+      } else { // error
+        toastIcon.classList.add('fas', 'fa-times-circle', 'text-red-500');
+      }
+
+      toastMessage.textContent = message;
+      toast.classList.add('show');
+
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function animateButton(button) {
+      button.classList.add('pressed');
+      setTimeout(() => {
+        button.classList.remove('pressed');
+      }, 300);
+    }
+
+    // ### FUNGSI COPY DIPERBARUI ###
+    function copyToClipboard(event, text) {
+      const button = event.currentTarget;
+      animateButton(button);
+
+      navigator.clipboard.writeText(text).then(() => {
+        const originalIcon = button.innerHTML;
+        button.innerHTML = `<i class="fas fa-check"></i>`;
+        button.style.color = '#22c55e'; // Tailwind green-500
+
+        // Memanggil toast dengan tipe 'success'
+        showToast("Nomor sudah disalin", "success");
+
+        setTimeout(() => {
+          button.innerHTML = originalIcon;
+          button.style.color = '';
+        }, 1500);
+      }).catch(err => {
+        console.error('Gagal menyalin:', err);
+        // Memanggil toast dengan tipe 'error'
+        showToast("Gagal menyalin nomor", "error");
+      });
+    }
+
+    function showQrModal(event) {
+      const button = event.currentTarget;
+      animateButton(button);
+      qrisModal.classList.remove('hidden');
+    }
+
+    function hideQrModal() {
+      qrisModal.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
